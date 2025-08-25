@@ -11,11 +11,7 @@ export async function apply(ctx: Context, config: Config) {
   const dataManager = new DataManager(ctx, config)
   await dataManager.load()
 
-  const cmd = ctx.command('deltaforce', '开始模拟跑刀')
-
-  for (const alias of config.aliases) {
-    cmd.alias(alias)
-  }
+  const cmd = ctx.command('跑刀', '开始模拟跑刀')
 
   cmd.action(async ({ session }) => {
     if (!session) return;
@@ -70,7 +66,7 @@ export async function apply(ctx: Context, config: Config) {
 
       await session.send(`已达到最大次数，自动撤离。`)
     } catch (error) {
-      ctx.logger.error('Error in deltaforce command:', error)
+      ctx.logger.error('Error in 跑刀 command:', error)
       return '执行过程中遇到错误，请查看控制台日志。'
     }
   })
