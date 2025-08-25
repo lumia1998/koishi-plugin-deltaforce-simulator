@@ -30,7 +30,12 @@ export async function apply(ctx: Context, config: Config) {
 
       while (retries < config.maxRetries) {
         await session.send('还要吃吗？（回复“还要吃”继续，或“撤离”结束）')
-        const reply = await session.prompt(config.timeout)
+        let reply = await session.prompt(config.timeout)
+
+        // 内部循环，处理无效输入
+        while (typeof reply === 'string' && reply.trim() !== '还要吃' && reply.trim() !== '撤离') {
+          reply = await session.prompt(config.timeout)
+        }
 
         // 新增：30% 概率死亡事件
         if (typeof reply === 'string' && reply.trim() === '还要吃' && Math.random() < 0.3) {
@@ -51,10 +56,7 @@ export async function apply(ctx: Context, config: Config) {
           return
         }
 
-        if (reply.trim() !== '还要吃') {
-          continue
-        }
-
+        // 到这里，回复必然是 "还要吃"
         retries++
         containerType = possibleContainers[Math.floor(Math.random() * possibleContainers.length)]
         const newContainerName = dataManager.containers[containerType]?.name || containerType
