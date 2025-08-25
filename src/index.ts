@@ -29,11 +29,21 @@ export async function apply(ctx: Context, config: Config) {
       await session.send(h.image(imageBuffer, 'image/png'))
 
       let askQuestion = true
+      let lastValidActionTime = Date.now()
+
       while (retries < config.maxRetries) {
+        const timeSinceLastAction = Date.now() - lastValidActionTime
+        if (timeSinceLastAction > config.timeout) {
+          await session.send('操作超时，已自动撤离。')
+          return
+        }
+
         if (askQuestion) {
           await session.send('还要吃吗？（回复“还要吃”继续，或“撤离”结束）')
         }
-        const reply = await session.prompt(config.timeout)
+        
+        const remainingTime = config.timeout - timeSinceLastAction
+        const reply = await session.prompt(remainingTime)
 
         // 新增：30% 概率死亡事件
         if (typeof reply === 'string' && reply.trim() === '还要吃' && Math.random() < 0.3) {
@@ -57,6 +67,7 @@ export async function apply(ctx: Context, config: Config) {
         }
 
         if (trimmedReply === '还要吃') {
+          lastValidActionTime = Date.now()
           askQuestion = true
           retries++
           containerType = possibleContainers[Math.floor(Math.random() * possibleContainers.length)]
