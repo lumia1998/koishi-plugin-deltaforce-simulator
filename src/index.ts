@@ -28,14 +28,12 @@ export async function apply(ctx: Context, config: Config) {
       const imageBuffer = await generateContainerImage(ctx, dataManager, containerType, session.username || '玩家')
       await session.send(h.image(imageBuffer, 'image/png'))
 
+      let askQuestion = true
       while (retries < config.maxRetries) {
-        await session.send('还要吃吗？（回复“还要吃”继续，或“撤离”结束）')
-        let reply = await session.prompt(config.timeout)
-
-        // 内部循环，处理无效输入
-        while (typeof reply === 'string' && reply.trim() !== '还要吃' && reply.trim() !== '撤离') {
-          reply = await session.prompt(config.timeout)
+        if (askQuestion) {
+          await session.send('还要吃吗？（回复“还要吃”继续，或“撤离”结束）')
         }
+        const reply = await session.prompt(config.timeout)
 
         // 新增：30% 概率死亡事件
         if (typeof reply === 'string' && reply.trim() === '还要吃' && Math.random() < 0.3) {
@@ -51,19 +49,25 @@ export async function apply(ctx: Context, config: Config) {
           return
         }
 
-        if (reply.trim() === '撤离') {
+        const trimmedReply = reply.trim()
+
+        if (trimmedReply === '撤离') {
           await session.send('成功撤离！')
           return
         }
 
-        // 到这里，回复必然是 "还要吃"
-        retries++
-        containerType = possibleContainers[Math.floor(Math.random() * possibleContainers.length)]
-        const newContainerName = dataManager.containers[containerType]?.name || containerType
-        await session.send(`又发现了一个 ${newContainerName}，正在开启...`)
-        
-        const newImageBuffer = await generateContainerImage(ctx, dataManager, containerType, session.username || '玩家')
-        await session.send(h.image(newImageBuffer, 'image/png'))
+        if (trimmedReply === '还要吃') {
+          askQuestion = true
+          retries++
+          containerType = possibleContainers[Math.floor(Math.random() * possibleContainers.length)]
+          const newContainerName = dataManager.containers[containerType]?.name || containerType
+          await session.send(`又发现了一个 ${newContainerName}，正在开启...`)
+          
+          const newImageBuffer = await generateContainerImage(ctx, dataManager, containerType, session.username || '玩家')
+          await session.send(h.image(newImageBuffer, 'image/png'))
+        } else {
+          askQuestion = false
+        }
       }
 
       await session.send(`已达到最大次数，自动撤离。`)
