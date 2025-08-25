@@ -1,0 +1,33 @@
+{
+  "name": "koishi-plugin-deltaforce-simulator",
+  "version": "1.1.6",
+  "description": "A deltaforce simulator plugin for Koishi（功能测试请勿下载）",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "dist",
+    "resource",
+    "container_configs.json"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "keywords": [
+    "chatbot",
+    "koishi",
+    "plugin",
+    "deltaforce"
+  ],
+  "peerDependencies": {
+    "koishi": "^4.17.0"
+  },
+  "dependencies": {
+    "sharp": "^0.33.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5"
+  }
+}
