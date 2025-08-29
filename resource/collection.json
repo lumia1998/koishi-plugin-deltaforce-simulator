@@ -4794,5 +4794,16 @@
         "propsDetail": {
             "type": "资料情报"
         }
+    },
+    {
+        "id": 11451,
+        "objectName": "柔情猫娘2.0",
+        "length": 2,
+        "width": 2,
+        "grade": 6,
+        "secondClass": "collection",
+        "secondClassCN": "收集品",
+        "desc": "柔情猫娘2.0，萌系可爱，治愈系爆表。",
+        "pic": "11451.png"
     }
 ]
